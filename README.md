@@ -7,7 +7,6 @@ La identificación temprana de enfermedades, especialmente aquellas raras o hué
 ## Finalidad
 
 Este programa de software proporciona una API simple que predice el estado de salud de un paciente basado en múltiples parámetros médicos relevantes.
-=======
 
 Los posibles estados retornados por el servicio son:
 *   `NO ENFERMO`
