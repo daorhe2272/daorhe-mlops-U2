@@ -13,6 +13,7 @@ Los posibles estados retornados por el servicio son:
 *   `ENFERMEDAD LEVE`
 *   `ENFERMEDAD AGUDA`
 *   `ENFERMEDAD CRÓNICA`
+*   `ENFERMEDAD TERMINAL`
 
 ## Estructura del Repositorio
 
@@ -167,6 +168,24 @@ Abra una terminal y pruebe los siguientes comandos (ajuste los valores para obte
     }'
     ```
     *Respuesta esperada:* `{"estado_predicho":"ENFERMEDAD CRÓNICA"}`
+
+*   **Para obtener "ENFERMEDAD TERMINAL":** (Factores de riesgo críticos)
+    ```bash
+    curl -X POST "http://localhost:5000/predecir" \
+    -H "Content-Type: application/json" \
+    -d '{
+        "edad": 85,
+        "presion_sistolica": 185,
+        "presion_diastolica": 115,
+        "frecuencia_cardiaca": 155,
+        "temperatura": 39.8,
+        "duracion_sintomas": 35,
+        "tiene_alergias": true,
+        "medicacion_previa": true,
+        "nivel_dolor": 9
+    }'
+    ```
+    *Respuesta esperada:* `{"estado_predicho":"ENFERMEDAD TERMINAL"}`
 
 Adicionalmente, FastAPI genera automáticamente documentación interactiva (Swagger UI). Abra su navegador web y vaya a: `http://localhost:5000/docs`
 Desde allí, puede ver los detalles del endpoint `/predecir`, probarlo directamente introduciendo los valores en la interfaz y ver las respuestas.

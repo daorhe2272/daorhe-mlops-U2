@@ -30,6 +30,19 @@ def simular_prediccion(datos: SintomasInput) -> str:
     Simula la predicción de un estado de salud basado en múltiples factores médicos.
     Esta es una versión simplificada que será reemplazada por un modelo de Deep Learning.
     """
+    # Verificación de factores de riesgo críticos
+    factores_criticos = (
+        datos.edad > 80 and
+        (datos.presion_sistolica > 180 or datos.presion_diastolica > 110) and
+        (datos.frecuencia_cardiaca > 150 or datos.frecuencia_cardiaca < 40) and
+        datos.temperatura > 39.5 and
+        datos.nivel_dolor > 8 and
+        datos.duracion_sintomas > 30
+    )
+    
+    if factores_criticos:
+        return "ENFERMEDAD TERMINAL"
+
     # Factores de riesgo calculados
     riesgo_edad = 1 if datos.edad > 65 else 0
     riesgo_presion = 1 if (datos.presion_sistolica > 140 or datos.presion_diastolica > 90) else 0
