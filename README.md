@@ -22,10 +22,11 @@ Este repositorio contiene una API de servicio de predicción de estado de salud 
 ### Archivos Principales
 
 - `funcion.py`: Contiene la implementación principal de la API, incluyendo:
-  - Definición de modelos de datos (SintomasInput, PrediccionOutput)
+  - Definición de modelos de datos (SintomasInput, PrediccionOutput, ReporteOutput)
   - Lógica de predicción simulada
-  - Endpoints de la API (/predecir y /)
+  - Endpoints de la API (/predecir, /reporte y /)
   - Validación de datos de entrada
+  - Sistema de logging de predicciones en JSON
 
 - `Dockerfile`: Configuración para containerizar la aplicación:
   - Basado en Python 3.9-slim
@@ -37,6 +38,10 @@ Este repositorio contiene una API de servicio de predicción de estado de salud 
   - fastapi: Framework web para la API
   - uvicorn: Servidor ASGI para ejecutar la aplicación
   - pydantic: Biblioteca para validación de datos
+  - pytz: Biblioteca para manejo de zonas horarias
+
+- `.gitignore`: Configuración para excluir archivos del control de versiones:
+  - predicciones.json: Archivo de registro de predicciones
 
 ### Características del Proyecto
 
@@ -45,10 +50,13 @@ Este repositorio contiene una API de servicio de predicción de estado de salud 
 - Documentación automática de la API (disponible en /docs)
 - Containerización con Docker
 - Simulación de predicción de estado de salud basada en múltiples parámetros médicos
+- Sistema de logging de predicciones con fecha y hora local (Bogotá)
+- Endpoint de reportes con estadísticas de predicciones
 
 ### Endpoints Disponibles
 
 - `POST /predecir`: Endpoint principal para obtener predicciones
+- `GET /reporte`: Endpoint para obtener estadísticas de las predicciones realizadas
 - `GET /`: Endpoint de verificación de estado del servicio
 
 ### Requisitos del Sistema
@@ -82,7 +90,10 @@ Este repositorio contiene una API de servicio de predicción de estado de salud 
 2.  El servicio estará ahora corriendo y accesible en `http://localhost:5000`.
 
 ## Cómo Obtener Respuestas del Modelo (Usar la API)
-Puede interactuar con la API de varias maneras (usando herramientas como `curl`, Postman, Insomnia, o mediante programación). El endpoint principal es `http://localhost:5000/predecir` y espera una solicitud `POST` con un cuerpo JSON que contenga los siguientes campos:
+Puede interactuar con la API de varias maneras (usando herramientas como `curl`, Postman, Insomnia, o mediante programación). Los endpoints disponibles son:
+
+### Endpoint de Predicción (`POST /predecir`)
+El endpoint principal es `http://localhost:5000/predecir` y espera una solicitud `POST` con un cuerpo JSON que contenga los siguientes campos:
 
 * `edad`: Edad del paciente en años (0-120)
 * `presion_sistolica`: Presión arterial sistólica en mmHg (60-250)
@@ -186,6 +197,68 @@ Abra una terminal y pruebe los siguientes comandos (ajuste los valores para obte
     }'
     ```
     *Respuesta esperada:* `{"estado_predicho":"ENFERMEDAD TERMINAL"}`
+
+### Endpoint de Reportes (`GET /reporte`)
+Este endpoint proporciona estadísticas sobre las predicciones realizadas. No requiere parámetros de entrada.
+
+Ejemplo usando `curl`:
+```bash
+curl -X GET "http://localhost:5000/reporte"
+```
+
+La respuesta incluirá:
+- Número total de predicciones realizadas
+- Conteo de predicciones por cada categoría
+- Las últimas 5 predicciones realizadas
+- Fecha de la última predicción
+
+Ejemplo de respuesta:
+```json
+{
+    "total_predicciones": 10,
+    "predicciones_por_categoria": {
+        "NO ENFERMO": 3,
+        "ENFERMEDAD LEVE": 4,
+        "ENFERMEDAD AGUDA": 2,
+        "ENFERMEDAD CRÓNICA": 1
+    },
+    "ultimas_predicciones": [
+        {
+            "fecha_hora": "2024-03-14 15:30:45",
+            "edad": 45,
+            "presion_sistolica": 120,
+            "presion_diastolica": 80,
+            "frecuencia_cardiaca": 75,
+            "temperatura": 36.5,
+            "duracion_sintomas": 2,
+            "tiene_alergias": false,
+            "medicacion_previa": false,
+            "nivel_dolor": 2,
+            "prediccion": "NO ENFERMO"
+        }
+        // ... hasta 5 predicciones más recientes
+    ],
+    "fecha_ultima_prediccion": "2024-03-14 15:30:45",
+    "mensaje": null
+}
+```
+
+Si no hay predicciones registradas, la respuesta será:
+```json
+{
+    "total_predicciones": 0,
+    "predicciones_por_categoria": {},
+    "ultimas_predicciones": [],
+    "fecha_ultima_prediccion": null,
+    "mensaje": "No hay predicciones registradas. Genere predicciones usando el endpoint /predecir para ver las estadísticas."
+}
+```
+
+### Sistema de Logging
+- Todas las predicciones se registran automáticamente en el archivo `predicciones.json`
+- El archivo incluye fecha y hora local de Bogotá para cada predicción
+- El archivo se excluye del control de versiones (git) para mantener los datos locales
+- Las predicciones se mantienen en orden cronológico
 
 Adicionalmente, FastAPI genera automáticamente documentación interactiva (Swagger UI). Abra su navegador web y vaya a: `http://localhost:5000/docs`
 Desde allí, puede ver los detalles del endpoint `/predecir`, probarlo directamente introduciendo los valores en la interfaz y ver las respuestas.
