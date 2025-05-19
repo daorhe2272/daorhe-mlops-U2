@@ -269,3 +269,45 @@ Desde allí, puede ver los detalles del endpoint `/predecir`, probarlo directame
 
 ## Limpiar la Imagen Docker (Opcional)
 Si ya no necesita la imagen Docker, puede eliminarla con el comando ```docker rmi servicio-prediccion```
+
+## Ejecutar las Pruebas Unitarias
+
+El proyecto incluye pruebas unitarias para verificar el correcto funcionamiento del servicio. Las pruebas utilizan pytest y cubren:
+- Verificación de predicciones para todas las categorías de enfermedad
+- Validación de estadísticas iniciales y después de predicciones
+- Verificación de la integridad de los datos almacenados
+
+### Ejecutar las Pruebas
+
+Las pruebas unitarias pueden ejecutarse directamente dentro del contenedor Docker para asegurar que el entorno es idéntico al de producción.
+
+1. Asegúrate de que el contenedor esté corriendo (puedes verificar con `docker ps`).
+2. Ejecuta el siguiente comando desde tu terminal:
+
+```bash
+docker exec predictor pytest tests/test_prediction.py -v
+```
+
+Esto ejecutará todas las pruebas y mostrará el resultado en la consola.
+
+El flag `-v` (verbose) muestra información detallada de cada prueba ejecutada.
+
+### Opciones Adicionales de pytest
+*   Para ver la cobertura de código: ```pytest --cov=funcion tests/```
+*   Para ejecutar una prueba específica: ```pytest tests/test_prediction.py::nombre_del_test -v```
+*   Para ver más detalles de las pruebas fallidas: ```pytest -vv tests/test_prediction.py```
+*   Para detener la ejecución en el primer error: ```pytest -x tests/test_prediction.py```
+
+### Estructura de las Pruebas
+Las pruebas están organizadas en el archivo `tests/test_prediction.py` y cubren:
+1. Verificación del estado inicial (estadísticas vacías)
+2. Pruebas de predicción para cada categoría de enfermedad:
+   - NO ENFERMO
+   - ENFERMEDAD LEVE
+   - ENFERMEDAD AGUDA
+   - ENFERMEDAD CRÓNICA
+   - ENFERMEDAD TERMINAL
+3. Verificación de estadísticas después de realizar predicciones
+4. Validación de la integridad de los datos almacenados
+
+Cada prueba se ejecuta en un entorno aislado, limpiando automáticamente el archivo de predicciones antes y después de cada prueba.

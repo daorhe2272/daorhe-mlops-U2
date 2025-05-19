@@ -8,6 +8,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY funcion.py .
+COPY tests/ tests/
+
+ENV PYTHONPATH=/app
 
 EXPOSE 5000
 
